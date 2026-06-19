@@ -8,7 +8,9 @@
 <!--
 [![DOI](https://zenodo.org/badge/DOI/[DOINUMBER]/zenodo.8189402.svg)](https://doi.org/[DOINUMBER]/zenodo.8189402) -->
 
-Finds $x$ in $A x = b$ by least-squares. Supports multiple right-hand-sides.
+(If you read this in NPM's repository MathJax formulas won't render well. Use this [GitHub link instead](https://github.com/santi-mir/fit-tnt)).
+
+If you have a linear system of equations: $X \mathbf{\beta} = \mathbf{y}$, this software finds the optimal coefficients $\mathbf{\beta}$ through a variation of ordinary least squares. It supports multiple right-hand-sides.
 
 The method is based off the [TNT](https://ieeexplore.ieee.org/abstract/document/8425520) paper by J. M. Myre et al.
 
@@ -39,14 +41,16 @@ npm i fit-tnt
 ```ts
 import { TNT } from 'fit-tnt';
 
-const A = [
+const X = [
   [1, 2, 3],
   [4, 5, 6],
 ]; // 2x3
-const b = [6, 12]; // or [[6],[12]]
+const y = [6, 12]; // or [[6],[12]]
 
 try {
-  const { XBest, metadata } = new TNT(A, b);
+  // XBest will be renamed in some future release.
+  // And follow naming more aligned with Wikipedia.
+  const { XBest: coefficients, metadata } = new TNT(X, y);
 } catch (e) {
   console.error(e);
 }
@@ -63,15 +67,11 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
 - Matrix Shape: rows 500, columns 200
 - Speed Up: **5.20**
 - Inverting the shape below, TNT is slower.
-
-```
-┌───────────────┬─────────────────────┬─────────────────────┐
-│ (index)       │       Avg Exec Time │           Avg Error │
-├───────────────┼─────────────────────┼─────────────────────┤
-│ TNT           │ 0.09470919929999999 │ 0.04945702797110891 │
-│ PseudoInverse │ 0.49272041820000007 │ 0.04945702797110894 │
-└───────────────┴─────────────────────┴─────────────────────┘
-```
+- 
+| (index)       |       Avg Exec Time |           Avg Error 
+|---------------|---------------------|--------------------- 
+| TNT           | 0.09470919929999999 | 0.04945702797110891 
+| PseudoInverse | 0.49272041820000007 | 0.04945702797110894 
 
 ## Misc.
 
@@ -82,29 +82,43 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
 Theoretical Background
 </summary>
 
-Linear systems appear everywhere: $A\,x = b$. Unique solutions ($x$) rarely exist. Least-Squares is one way to select the best:
+A Linear System of Equations is denoted as $X \mathbf{\beta} = \mathbf{y}$. 
 
-$G(x) = \mathrm{min}_x \lVert A\,x -b \rVert_2^2$
+In practice, exact solutions ($\mathbf{\beta}$) are a rare case rather than a common one.
+Cost functions are designed with the goal of approximating the solution vector.
 
-Searching the gradient-vector $G(x)=\vec{0}$ we get the normal equation $A^T\,A x = A^T b$
+Least-Squares' one such method and involves minimising the sum of squared errors.
+Formally, this is written as finding the arguments of $\mathbf{\beta}$ that minimise the squared norm:
 
-This is also a linear system! $S x = y$. If the symmetric matrix $S$ is positive definite (hence $A$ has l.i. cols.) then it is invertible and can be solved using $\mathrm{Cho(S)} = L L^T$ and solving two triangular systems, which is fast and simple.
+$\large\mathrm{arg min}_\mathbf{\beta} \lVert X \mathbf{\mathbf{\beta}} - \mathbf{y} \rVert_2^2$
 
-When computed directly (as done here), $S=A^T\,A$ has a condition number $\kappa (A^T A) = \kappa (A)^2$. So it will fail for near-singular $S$. _Preconditioning tries to reduce this problem_. Larger condition number also tends to slow the convergence of iterative methods.
+Taking derivatives and equating it to the zero-vector $\vec{0}$, we arrive to the normal equation $X^T X \mathbf{\beta} = X^T \mathbf{y}$
+
+Just as the original case, this is _also a linear system of equations_. $S \mathbf{\beta} = \mathbf{y}$. 
+
+**If** the symmetric matrix $S$ is **positive definite** (hence $X$ has l.i. cols.) then:
+
+1. It is invertible,
+2. And can be factored as $\mathrm{Cholesky}(S) = L L^T$,
+3. And we can solving the total system as _two triangular systems_, which is fast and simple.
+
+The condition number $S=X^T X$ is $\kappa (X^T X) = \kappa (X)^2$. So it will fail for near-singular $S$. 
+
+_Preconditioning tries to reduce this problem_. Larger condition number also tends to slow the convergence of iterative methods.
 
 **TNT**
 
 The Conjugate Gradient for Normal Residual (CGNR) is a popular method for solving Sparse Least-Squares problems, where the design matrix has many zeros.
 
-For wide-$A$, where $\frac{n}{m} \gt 1$ calculating and factoring $A^T A$ becomes computationally demanding, given its $n^2$ separate elements. Here pseudo-inverse will be faster. TNT tends to be faster when $m \geq n$.
+For wide $X$, where $\frac{n}{m} \gt 1$ calculating and factoring $X^T A$ becomes computationally demanding, given its $n^2$ separate elements. Here pseudo-inverse will be faster. TNT tends to be faster when $m \geq n$.
 
-TNT preconditions $A^T\,A$ so that it has an inverse and a smaller condition number, then iteratively solves using CGNR.
+TNT preconditions $A^T A$ so that it has an inverse and a smaller condition number, then iteratively solves using CGNR.
 
-Positive definite means that $x^T M x \gt 0$. In our case: $x^T \,(A^T A)\, x \gt 0$, and $(A\,x)^T (A x) \gt 0$
+Positive definite means that $\mathbf{\beta}^T M \mathbf{\beta} \gt 0$. In our case: $\mathbf{\beta}^T (X^T X) \mathbf{\beta} \gt 0$, and $(X \mathbf{\beta})^T (X \mathbf{\beta}) \gt 0$
 
-The $(\ldots)$ are non-zero when the columns are linearly independent. If the columns of $A$ are linearly independent then it's invertible/non-singular, and $A^T A$ is invertible.
+The $(\ldots)$ are non-zero when the columns are linearly independent. If the columns of $X$ are linearly independent then it's invertible/non-singular, and $X^T X$ is invertible.
 
-So we want to pre-condition $A^T A$ so that it is invertible, we also want to avoid tiny numbers in the diagonal of the decomposition.
+So we want to pre-condition $X^T X$ so that it is invertible, we also want to avoid tiny numbers in the diagonal of the decomposition.
 
 </details>
 
@@ -112,7 +126,9 @@ So we want to pre-condition $A^T A$ so that it is invertible, we also want to av
 <summary>
 Algorithm Description
 </summary>
-
+  
+**Note**: I used different letters here, and needs clean up.
+  
 1. Carry out product: $N=A^T\,A$ (`N` is Symmetric.)
 2. [Cholesky Decomposition](https://en.wikipedia.org/wiki/Cholesky_decomposition) and factor: R, p = Cho(N)
 3. `if !p: N = N + e\*I`, $\epsilon$ being a tiny number.
