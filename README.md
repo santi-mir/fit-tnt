@@ -48,9 +48,7 @@ const X = [
 const y = [6, 12]; // or [[6],[12]]
 
 try {
-  // XBest will be renamed in some future release.
-  // And follow naming more aligned with Wikipedia.
-  const { XBest: coefficients, metadata } = new TNT(X, y);
+  const { Beta, metadata } = new TNT(X, y);
 } catch (e) {
   console.error(e);
 }
@@ -112,7 +110,7 @@ The Conjugate Gradient for Normal Residual (CGNR) is a popular method for solvin
 
 For wide $X$, where $\frac{n}{m} \gt 1$ calculating and factoring $X^T A$ becomes computationally demanding, given its $n^2$ separate elements. Here pseudo-inverse will be faster. TNT tends to be faster when $m \geq n$.
 
-TNT preconditions $A^T A$ so that it has an inverse and a smaller condition number, then iteratively solves using CGNR.
+TNT preconditions $X^T X$ so that it has an inverse and a smaller condition number, then iteratively solves using CGNR.
 
 Positive definite means that $\mathbf{\beta}^T M \mathbf{\beta} \gt 0$. In our case: $\mathbf{\beta}^T (X^T X) \mathbf{\beta} \gt 0$, and $(X \mathbf{\beta})^T (X \mathbf{\beta}) \gt 0$
 
