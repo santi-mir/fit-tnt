@@ -67,7 +67,8 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
 - Matrix Shape: rows 500, columns 200
 - Speed Up: **5.20**
 - Inverting the shape below, TNT is slower.
-- | (index)       | Avg Exec Time       | Avg Error           |
+
+  | (index)       | Avg Exec Time       | Avg Error           |
   | ------------- | ------------------- | ------------------- |
   | TNT           | 0.09470919929999999 | 0.04945702797110891 |
   | PseudoInverse | 0.49272041820000007 | 0.04945702797110894 |
@@ -125,9 +126,9 @@ So we want to pre-condition $X^T X$ so that it is invertible, we also want to av
 <summary>
 Algorithm Description
 </summary>
-  
+
 **Note**: I used different letters here, and needs clean up.
-  
+
 1. Carry out product: $N=A^T\,A$ (`N` is Symmetric.)
 2. [Cholesky Decomposition](https://en.wikipedia.org/wiki/Cholesky_decomposition) and factor: R, p = Cho(N)
 3. `if !p: N = N + e\*I`, $\epsilon$ being a tiny number.
