@@ -1,5 +1,16 @@
 # Changelog
 
+## [10.0.0](https://github.com/santi-mir/fit-tnt/compare/v9.0.0...v10.0.0) (2026-06-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* use naming as XB=Y rather than AX=B. ([#30](https://github.com/santi-mir/fit-tnt/issues/30))
+
+### rename
+
+* use naming as XB=Y rather than AX=B. ([#30](https://github.com/santi-mir/fit-tnt/issues/30)) ([795d158](https://github.com/santi-mir/fit-tnt/commit/795d158bbd4e3792d8736fd6b224992c2b48d5a7))
+
 ## [9.0.0](https://github.com/newresu/fit-tnt/compare/v8.0.3...v9.0.0) (2025-03-26)
 
 
