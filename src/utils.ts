@@ -3,13 +3,13 @@ import { Matrix, MatrixColumnSelectionView } from 'ml-matrix';
 import { AnyMatrix, Array1D, Array2D } from './types';
 
 /**
- * The output $B$ can be passed as flat array, nested array or matrix.
+ * The result matrix `Y` can be passed as flat array, nested array or matrix.
  * This function ensures that it is correctly converted to matrix in those
  * cases.
  * @param input matrix or array
- * @returns B matrix
+ * @returns Y matrix
  */
-export function ensureMatrixB(input: Array1D | Array2D | AnyMatrix): AnyMatrix {
+export function ensureMatrixY(input: Array1D | Array2D | AnyMatrix): AnyMatrix {
   if (Matrix.isMatrix(input)) {
     return input;
   } else if (Array.isArray(input[0])) {
@@ -20,9 +20,9 @@ export function ensureMatrixB(input: Array1D | Array2D | AnyMatrix): AnyMatrix {
 
 /**
  * These uses one of the arrays as filter for the others.
- * @param indices these are the indices from the original columns of X.
+ * @param indices these are the indices from the original columns of B.
  * @param alpha conjugate gradient value
- * @param subsetIndices X indices but shifted to zero, for other matrices.
+ * @param subsetIndices B indices but shifted to zero, for other matrices.
  * @returns filtered arrays with non NaN or Inf values.
  */
 export function filterIndices(

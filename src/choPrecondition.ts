@@ -5,13 +5,13 @@ import { PreconditionError } from './Errors';
 import { getCriteria } from './getCholeskyCriteria';
 
 /**
- * Do `A^T A += d*I` until AtA is positive definite and `L` is "nice".
- * **Mutates** AtA
- * @param AtA - Symmetric matrix from the normal equation.
- * @returns Cholesky Decomposition of AtA
+ * Do `A^T X += d*I` until XtX is positive definite and `L` is "nice".
+ * **Mutates** XtA
+ * @param XtX - Symmetric matrix from the normal equation.
+ * @returns Cholesky Decomposition of XtA
  */
-export function choleskyPrecondition(AtA: Matrix) {
-  let choleskyDC = new CholeskyDecomposition(AtA);
+export function choleskyPrecondition(XtX: Matrix) {
+  let choleskyDC = new CholeskyDecomposition(XtX);
 
   let diag = choleskyDC.lowerTriangularMatrix.diagonal();
 
@@ -23,10 +23,10 @@ export function choleskyPrecondition(AtA: Matrix) {
       //includes isNaN
       throw new PreconditionError();
     }
-    for (let i = 0; i < AtA.rows; i++) {
-      AtA.set(i, i, AtA.get(i, i) + criteria.eps);
+    for (let i = 0; i < XtX.rows; i++) {
+      XtX.set(i, i, XtX.get(i, i) + criteria.eps);
     }
-    choleskyDC = new CholeskyDecomposition(AtA); //again
+    choleskyDC = new CholeskyDecomposition(XtX); //again
     diag = choleskyDC.lowerTriangularMatrix.diagonal();
     criteria = getCriteria(diag, 1 - it);
     it--;

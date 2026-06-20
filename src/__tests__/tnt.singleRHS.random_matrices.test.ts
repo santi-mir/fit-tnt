@@ -8,8 +8,8 @@ describe('Single RHS, random values', () => {
     for (let i = 0; i < 1e3; i++) {
       const m = Math.ceil(Math.random() * 12) + 2;
       const n = Math.ceil(Math.random() * 12) + 2;
-      const { inputs: A, outputs: b } = makeData(m, n);
-      const { XBest: xBest, metadata: e } = new TNT(A, b);
+      const { inputs: X, outputs: b } = makeData(m, n);
+      const { Beta: xBest, metadata: e } = new TNT(X, b);
       expect(e[0].mseMin).toBeLessThan(1e-4);
       expect(xBest.to1DArray().every(Number.isFinite)).toBeTruthy();
     }
@@ -19,12 +19,12 @@ describe('Single RHS, random values', () => {
     for (let i = 0; i < 1e3; i++) {
       const m = Math.ceil(Math.random() * 12) + 2;
       const n = Math.ceil(Math.random() * 12) + 2;
-      const { inputs: bigA, outputs: b } = makeData(m, n, { scaleA: 100 });
+      const { inputs: bigX, outputs: b } = makeData(m, n, { scaleX: 100 });
       const {
         metadata,
         maxIterations,
-        XBest: xBest,
-      } = new TNT(bigA, b, {
+        Beta: xBest,
+      } = new TNT(bigX, b, {
         maxIterations: 5,
       });
       expect(xBest.to1DArray().every(Number.isFinite)).toBeTruthy();
@@ -36,19 +36,19 @@ describe('Single RHS, random values', () => {
     }
   });
 
-  it('Scaled Up X (on AX=>B) to make large B', () => {
+  it('Scaled Up B (on AX=>Y) to make large B', () => {
     for (let i = 0; i < 1e3; i++) {
       const m = Math.ceil(Math.random() * 12) + 2;
       const n = Math.ceil(Math.random() * 12) + 2;
-      const { inputs: A, outputs: bigB } = makeData(m, n, {
-        scaleX: 100,
+      const { inputs: X, outputs: bigY } = makeData(m, n, {
+        scaleB: 100,
         addNoise: true,
       });
       const {
         metadata,
         maxIterations,
-        XBest: xBest,
-      } = new TNT(A, bigB, { maxIterations: 4 });
+        Beta: xBest,
+      } = new TNT(X, bigY, { maxIterations: 4 });
 
       expect(xBest.to1DArray().every(Number.isFinite)).toBeTruthy();
 
