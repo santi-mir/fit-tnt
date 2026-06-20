@@ -16,32 +16,32 @@ interface SquaredSumOpts {
 /**
  * 1. Square the matrix
  * 2. Add the column elements.
- * @param A input matrix.
+ * @param X input matrix.
  * @param opts options for performing the sums.
  * @returns array with mean values per column
  */
-export function squaredSum(A: AnyMatrix, opts: Partial<SquaredSumOpts> = {}) {
+export function squaredSum(X: AnyMatrix, opts: Partial<SquaredSumOpts> = {}) {
   const { by = 'column' } = opts;
-  const result: number[] = new Array(by === 'column' ? A.columns : A.rows).fill(
+  const result: number[] = new Array(by === 'column' ? X.columns : X.rows).fill(
     0,
   ) as number[];
-  if (A.isColumnVector() || A.isRowVector()) {
-    return [A.dot(A)];
+  if (X.isColumnVector() || X.isRowVector()) {
+    return [X.dot(X)];
   } else {
     // square of each number in the matrix, and add it up.
     if (by === 'column') {
-      for (let j = 0; j < A.columns; j++) {
+      for (let j = 0; j < X.columns; j++) {
         let terms = 0;
-        for (let i = 0; i < A.rows; i++) {
-          terms += A.get(i, j) ** 2;
+        for (let i = 0; i < X.rows; i++) {
+          terms += X.get(i, j) ** 2;
         }
         result[j] = terms;
       }
     } else {
-      for (let i = 0; i < A.rows; i++) {
+      for (let i = 0; i < X.rows; i++) {
         let terms = 0;
-        for (let j = 0; j < A.columns; j++) {
-          terms += A.get(i, j) ** 2;
+        for (let j = 0; j < X.columns; j++) {
+          terms += X.get(i, j) ** 2;
         }
         result[i] = terms;
       }

@@ -2,28 +2,28 @@ import { AnyMatrix } from './types';
 
 /**
  * Check that dimensionality of matrices matches.
- * @param A input data matrix
- * @param X solution matrix
- * @param B results matrix
+ * @param X input data matrix
+ * @param B solution matrix
+ * @param Y results matrix
  */
 export function checkMatchingDimensions(
-  A: AnyMatrix,
   X: AnyMatrix,
   B: AnyMatrix,
+  Y: AnyMatrix,
 ) {
-  if (A.rows !== B.rows) {
+  if (X.rows !== Y.rows) {
     throw new RangeError(
-      `Rows of A and y must match. Found dim(A)=(${A.rows}, ${A.columns}) and dim(y)=(${B.rows}, ${B.columns})`,
+      `Rows of X and y must match. Found dim(X)=(${X.rows}, ${X.columns}) and dim(y)=(${Y.rows}, ${Y.columns})`,
     );
   }
-  if (A.columns !== X.rows) {
+  if (X.columns !== B.rows) {
     throw new RangeError(
-      `Columns of A and rows of X must match. Found dim(A)=(${A.rows}, ${A.columns}) and dim(X)=(${X.rows}, ${X.columns})`,
+      `Columns of X and rows of B must match. Found dim(X)=(${X.rows}, ${X.columns}) and dim(B)=(${B.rows}, ${B.columns})`,
     );
   }
-  if (X.columns !== B.columns) {
+  if (B.columns !== Y.columns) {
     throw new RangeError(
-      `Columns of X and y must match. Found dim(X)=(${X.rows}, ${X.columns}) and dim(y)=(${B.rows}, ${B.columns})`,
+      `Columns of B and y must match. Found dim(B)=(${B.rows}, ${B.columns}) and dim(y)=(${Y.rows}, ${Y.columns})`,
     );
   }
 }

@@ -25,7 +25,7 @@ export function lowerTriangularInverse(lowerTriangular: Matrix) {
   return V;
 }
 /**
- * Solve the system  `LL^T X = I`
+ * Solve the system  `LL^T B = I`
  * To obtain the inverse. This involves solving two systems of equations.
  *
  * However, calculating $L^{-1}$, we can find the other one.

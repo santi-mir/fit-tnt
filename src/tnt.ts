@@ -14,10 +14,10 @@ import {
   EarlyStopping,
   TNTOpts,
 } from './types';
-import { ensureMatrixB, filterIndices, getColumnViews } from './utils';
+import { ensureMatrixY, filterIndices, getColumnViews } from './utils';
 
 /**
- * Find the best `X` in `A X = B`; where `A` and `B` are known.
+ * Find the best `X` in `X B = B`; where `A` and `B` are known.
  * By 'best' it refers to the least-squares (least error) solution.
  *
  * Multiple RHS are supported (`B` can be a vector or matrix)
@@ -26,7 +26,7 @@ import { ensureMatrixB, filterIndices, getColumnViews } from './utils';
  * @param opts {@link TNTOpts}
  */
 export class TNT {
-  XBest: AnyMatrix;
+  Beta: AnyMatrix;
   /**
    * {@link TNTOpts["maxIterations"]}
    */
@@ -47,9 +47,9 @@ export class TNT {
     output: Array2D | Array1D | AnyMatrix,
     opts: Partial<TNTOpts> = {},
   ) {
-    const A = Matrix.checkMatrix(data);
-    const B = ensureMatrixB(output);
-    this.XBest = new Matrix(A.columns, B.columns);
+    const X = Matrix.checkMatrix(data);
+    const Y = ensureMatrixY(output);
+    this.Beta = new Matrix(X.columns, Y.columns);
 
     // unpack options
     const { maxIterations = 4, earlyStopping: { minMSE = 1e-20 } = {} } = opts;
@@ -57,8 +57,8 @@ export class TNT {
     this.maxIterations = maxIterations;
     this.earlyStopping = { minMSE };
 
-    this.metadata = squaredSum(B).map((x) => {
-      x = x / B.rows;
+    this.metadata = squaredSum(Y).map((x) => {
+      x = x / Y.rows;
       return {
         mse: [x],
         mseMin: x,
@@ -67,7 +67,7 @@ export class TNT {
       };
     });
 
-    this.#tnt(A, B);
+    this.#tnt(X, Y);
   }
 
   /**
@@ -75,8 +75,8 @@ export class TNT {
    * 2. Set `XBest` and `mseMin` **iff** it improved
    * 3. Sets `indices[i]=NaN` if it didn't improve.
    * @param mseLast list of mean squared errors for each column
-   * @param XView columns of X currently available.
-   * @param indices track which columns of initial X are optimized.
+   * @param XView columns of B currently available.
+   * @param indices track which columns of initial B are optimized.
    */
   #updateMSEAndX(mseLast: number[], XView: AnyMatrix, indices: number[]) {
     for (let i = 0; i < indices.length; i++) {
@@ -86,7 +86,7 @@ export class TNT {
       columnInfo.iterations++;
       if (columnInfo.mseLast < columnInfo.mseMin) {
         columnInfo.mseMin = columnInfo.mseLast;
-        this.XBest.setColumn(indices[i], XView.getColumn(i));
+        this.Beta.setColumn(indices[i], XView.getColumn(i));
       } else {
         indices[i] = NaN;
       }
@@ -94,30 +94,30 @@ export class TNT {
   }
 
   /**
-   * Find the XBest and set it in the class.
-   * @param A data matrix
-   * @param B solution matrix
+   * Find the Beta and set it in the class.
+   * @param X data matrix
+   * @param Y solution matrix
    */
-  #tnt(A: AnyMatrix, B: AnyMatrix) {
-    const X: AnyMatrix = Matrix.zeros(A.columns, B.columns);
-    checkMatchingDimensions(A, X, B);
+  #tnt(X: AnyMatrix, Y: AnyMatrix) {
+    const B: AnyMatrix = Matrix.zeros(X.columns, Y.columns);
+    checkMatchingDimensions(X, B, Y);
 
-    // indices of current "on" columns of X.
-    let indices = new Array(X.columns).fill(0).map((_, i) => i);
+    // indices of current "on" columns of B.
+    let indices = new Array(B.columns).fill(0).map((_, i) => i);
     // same but for matrices that are recalculated as it runs.
     let shiftedIndices;
 
-    const At = A.transpose(); // copy is ok
-    const AtA = symmetricMul(At);
+    const Xt = X.transpose(); // copy is ok
+    const XtX = symmetricMul(Xt);
 
-    const choleskyDC = choleskyPrecondition(AtA);
+    const choleskyDC = choleskyPrecondition(XtX);
     const L = choleskyDC.lowerTriangularMatrix;
-    const AtA_inv = invertLLt(L);
+    const XtA_inv = invertLLt(L);
 
-    const Residual = B.clone(); // r = b - Ax_0 (Ax_0 = 0)
-    let Gradient = At.mmul(Residual); // r_hat = At * r
-    // z_0 = AtA_inv * r_hat = AtA_inv * At b - x_0
-    let XError = AtA_inv.mmul(Gradient);
+    const Residual = Y.clone(); // r = b - Ax_0 (Ax_0 = 0)
+    let Gradient = Xt.mmul(Residual); // r_hat = Xt * r
+    // z_0 = XtA_inv * r_hat = XtA_inv * Xt b - x_0
+    let XError = XtA_inv.mmul(Gradient);
     const P = XError.clone(); // z_0 clone
 
     let W: Matrix;
@@ -125,7 +125,7 @@ export class TNT {
     let [alpha, betaDenom, beta, mseLast]: number[][] = [[], [], []];
 
     // These are updated with `indices`
-    let [X_View, B_View, P_View]: AnyMatrix[] = [X, B, P];
+    let [X_View, B_View, P_View]: AnyMatrix[] = [B, Y, P];
     // These are updated with `shiftedIndices`
     let [GradientView, ResidualView, XErrorView]: AnyMatrix[] = [
       Gradient,
@@ -134,7 +134,7 @@ export class TNT {
     ];
 
     for (let it = 0; it < this.maxIterations; it++) {
-      W = A.mmul(P_View);
+      W = X.mmul(P_View);
       ww = squaredSum(W);
       alpha = Matrix.multiply(XError, Gradient)
         .sum('column')
@@ -146,12 +146,12 @@ export class TNT {
 
       // view of columns to solve if needed
       if (indices.length < X_View.columns) {
-        [X_View, B_View, P_View] = getColumnViews(indices, X, B, P);
+        [X_View, B_View, P_View] = getColumnViews(indices, B, Y, P);
       }
       X_View.add(P_View.clone().mulRowVector(alpha)); //update x
 
-      // With X updated, we need to narrow down again.
-      mseLast = meanSquaredError(A, B_View, X_View);
+      // With B updated, we need to narrow down again.
+      mseLast = meanSquaredError(X, B_View, X_View);
       this.#updateMSEAndX(mseLast, X_View, indices);
 
       [indices, alpha, shiftedIndices] = filterIndices(
@@ -163,7 +163,7 @@ export class TNT {
       if (indices.length === 0) break;
 
       if (indices.length < X_View.columns) {
-        [X_View, B_View] = getColumnViews(indices, X, B);
+        [X_View, B_View] = getColumnViews(indices, B, Y);
       }
 
       [GradientView, XErrorView, ResidualView] = getColumnViews(
@@ -177,8 +177,8 @@ export class TNT {
       betaDenom = Matrix.multiply(XErrorView, GradientView).sum('column');
       ResidualView.sub(ResidualView.clone().mulRowVector(alpha)); // update residual
 
-      Gradient = At.mmul(ResidualView); // new g
-      XError = AtA_inv.mmul(Gradient); // new x_error
+      Gradient = Xt.mmul(ResidualView); // new g
+      XError = XtA_inv.mmul(Gradient); // new x_error
       beta = Matrix.multiply(XError, Gradient)
         .sum('column')
         .map((x, i) => x / betaDenom[i]);

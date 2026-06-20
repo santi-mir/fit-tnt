@@ -42,7 +42,7 @@ describe('Test some ill conditioned matrices', () => {
   });
 
   it('hard matrix multi-RHS', () => {
-    const A = new Matrix([
+    const X = new Matrix([
       [-90.2419, -84.2534, -12.7045, -46.9038, -13.755, 95.1238, -61.5441],
       [82.8602, -47.9659, 6.05526, -80.739, 99.4879, -65.3956, -22.0943],
       [-22.5724, 17.741, -85.0359, -71.1472, -7.13554, -58.379, 63.7102],
@@ -51,7 +51,7 @@ describe('Test some ill conditioned matrices', () => {
       [82.8733, 59.1238, 97.5522, 9.94099, -40.2938, -18.3154, -22.6148],
     ]);
 
-    const B = new Matrix([
+    const Y = new Matrix([
       [-121.217, -50.0461, -112.467, -198.172, -66.483, -89.1029],
       [-30.8537, -104.756, -103.17, -55.9705, -25.6904, 10.3326],
       [-136.922, -69.2575, -88.9156, -121.656, -148.303, -26.298],
@@ -61,13 +61,13 @@ describe('Test some ill conditioned matrices', () => {
     ]);
 
     // tnt
-    const r = new TNT(A, B);
+    const r = new TNT(X, Y);
     const { mseMin } = r.metadata[0];
     expect(mseMin).toBeLessThan(5e-11);
 
     // pseudoInverse
-    const X = pseudoInverse(A).mmul(B);
-    const minErrorPseudoInverse = meanSquaredError(A, B, X);
+    const B = pseudoInverse(X).mmul(Y);
+    const minErrorPseudoInverse = meanSquaredError(X, Y, B);
     expect(minErrorPseudoInverse[0]).toBeLessThan(1e-20);
   });
 });

@@ -25,13 +25,13 @@ interface MakeDataOpts {
    * Scale the input data (`X`) by this number.
    * @default 1 (no scaling)
    */
-  scaleX: number;
+  scaleB: number;
 
   /**
    * Scale the coefficients (`A`) by this number.
    * @default 1 (no scaling)
    */
-  scaleA: number;
+  scaleX: number;
 }
 /**
  * Make `A`, `B` and `X` matrices to use for testing purposes.
@@ -46,44 +46,44 @@ export function makeData(
   opts: Partial<MakeDataOpts> = {},
 ) {
   const {
+    scaleB = 1,
     scaleX = 1,
-    scaleA = 1,
     outputColumns = 1,
     useBias = false,
     addNoise = true,
   } = opts;
 
   // design matrix / input data
-  const A = Matrix.random(samples, coefficients, {
+  const X = Matrix.random(samples, coefficients, {
     random: myRandom,
   });
 
-  if (scaleA !== 1) {
-    // before adding bias
-    A.mul(scaleA);
-  }
-
-  if (useBias) {
-    A.addColumn(Matrix.ones(samples, 1));
-  }
-
-  const X = Matrix.random(
-    useBias ? coefficients + 1 : coefficients,
-    outputColumns,
-  );
   if (scaleX !== 1) {
+    // before adding bias
     X.mul(scaleX);
   }
 
-  const B = A.mmul(X);
+  if (useBias) {
+    X.addColumn(Matrix.ones(samples, 1));
+  }
+
+  const B = Matrix.random(
+    useBias ? coefficients + 1 : coefficients,
+    outputColumns,
+  );
+  if (scaleB !== 1) {
+    B.mul(scaleB);
+  }
+
+  const Y = X.mmul(B);
   if (addNoise) {
-    B.add(
+    Y.add(
       Matrix.random(samples, outputColumns, { random: myRandom }).mul(
-        scaleX / 100,
+        scaleB / 100,
       ),
     );
   }
-  return { inputs: A, outputs: B, coefficients: X };
+  return { inputs: X, outputs: Y, coefficients: B };
 }
 
 /**

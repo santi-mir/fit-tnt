@@ -1,17 +1,17 @@
 import { AnyMatrix } from './types';
 
 /**
- * Calculate the mean squared error `||AX - B||^2`
- * @param A input data
- * @param B output data
- * @param X current coefficients
+ * Calculate the mean squared error `||AB - B||^2`
+ * @param X input data
+ * @param Y output data
+ * @param B current coefficients
  * @returns the mean squared error
  */
-export function meanSquaredError(A: AnyMatrix, B: AnyMatrix, X: AnyMatrix) {
-  const Err: AnyMatrix = A.mmul(X).sub(B);
+export function meanSquaredError(X: AnyMatrix, Y: AnyMatrix, B: AnyMatrix) {
+  const Err: AnyMatrix = X.mmul(B).sub(Y);
   const { rows: samples, columns: coeffs } = Err;
 
-  const result: number[] = new Array(X.columns).fill(0) as number[];
+  const result: number[] = new Array(B.columns).fill(0) as number[];
   if (Err.isColumnVector()) {
     return [Err.dot(Err) / samples];
   } else {

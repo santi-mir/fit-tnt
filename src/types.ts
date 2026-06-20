@@ -24,7 +24,7 @@ export interface TNTOpts {
   earlyStopping: EarlyStopping;
 }
 /**
- * Each column of X has its own life and its metadata is stored separately.
+ * Each column of B has its own life and its metadata is stored separately.
  */
 export interface ColumnInfo {
   /**
