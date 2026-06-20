@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.1](https://github.com/santi-mir/fit-tnt/compare/v10.0.0...v10.0.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* tsconfig ([eb8b730](https://github.com/santi-mir/fit-tnt/commit/eb8b73050da6fd83de7509464aec8666c810c8e8))
+
 ## [10.0.0](https://github.com/santi-mir/fit-tnt/compare/v9.0.0...v10.0.0) (2026-06-20)
 
 
