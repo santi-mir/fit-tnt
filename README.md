@@ -67,11 +67,10 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
 - Matrix Shape: rows 500, columns 200
 - Speed Up: **5.20**
 - Inverting the shape below, TNT is slower.
-- 
-| (index)       |       Avg Exec Time |           Avg Error 
-|---------------|---------------------|--------------------- 
-| TNT           | 0.09470919929999999 | 0.04945702797110891 
-| PseudoInverse | 0.49272041820000007 | 0.04945702797110894 
+- | (index)       | Avg Exec Time       | Avg Error           |
+  | ------------- | ------------------- | ------------------- |
+  | TNT           | 0.09470919929999999 | 0.04945702797110891 |
+  | PseudoInverse | 0.49272041820000007 | 0.04945702797110894 |
 
 ## Misc.
 
@@ -82,7 +81,7 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
 Theoretical Background
 </summary>
 
-A Linear System of Equations is denoted as $X \mathbf{\beta} = \mathbf{y}$. 
+A Linear System of Equations is denoted as $X \mathbf{\beta} = \mathbf{y}$.
 
 In practice, exact solutions ($\mathbf{\beta}$) are a rare case rather than a common one.
 Cost functions are designed with the goal of approximating the solution vector.
@@ -94,7 +93,7 @@ $\large\mathrm{arg min}_\mathbf{\beta} \lVert X \mathbf{\mathbf{\beta}} - \mathb
 
 Taking derivatives and equating it to the zero-vector $\vec{0}$, we arrive to the normal equation $X^T X \mathbf{\beta} = X^T \mathbf{y}$
 
-Just as the original case, this is _also a linear system of equations_. $S \mathbf{\beta} = \mathbf{y}$. 
+Just as the original case, this is _also a linear system of equations_. $S \mathbf{\beta} = \mathbf{y}$.
 
 **If** the symmetric matrix $S$ is **positive definite** (hence $X$ has l.i. cols.) then:
 
@@ -102,7 +101,7 @@ Just as the original case, this is _also a linear system of equations_. $S \math
 2. And can be factored as $\mathrm{Cholesky}(S) = L L^T$,
 3. And we can solving the total system as _two triangular systems_, which is fast and simple.
 
-The condition number $S=X^T X$ is $\kappa (X^T X) = \kappa (X)^2$. So it will fail for near-singular $S$. 
+The condition number $S=X^T X$ is $\kappa (X^T X) = \kappa (X)^2$. So it will fail for near-singular $S$.
 
 _Preconditioning tries to reduce this problem_. Larger condition number also tends to slow the convergence of iterative methods.
 
