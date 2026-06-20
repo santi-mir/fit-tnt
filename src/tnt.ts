@@ -125,6 +125,8 @@ export class TNT {
 
     let W: Matrix;
     let ww: number[];
+    /* eslint-disable no-useless-assignment */
+    /* should be fixed in the future */
     let [alpha, betaDenom, beta, mseLast]: number[][] = [[], [], []];
 
     // These are updated with `indices`
