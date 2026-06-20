@@ -17,15 +17,18 @@ import {
 import { ensureMatrixY, filterIndices, getColumnViews } from './utils';
 
 /**
- * Find the best `X` in `X B = B`; where `A` and `B` are known.
+ * Find the best `X` in `X B = Y`; where `X` and `Y` are known.
  * By 'best' it refers to the least-squares (least error) solution.
  *
- * Multiple RHS are supported (`B` can be a vector or matrix)
+ * Multiple RHS are supported (`B` and `Y` can be vectors or matrices)
  * @param data the input or data matrix (2D Array)
  * @param output the known-output
  * @param opts {@link TNTOpts}
  */
 export class TNT {
+  /**
+   * Optimal coefficients found.
+   */
   Beta: AnyMatrix;
   /**
    * {@link TNTOpts["maxIterations"]}
