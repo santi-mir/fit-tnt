@@ -8,29 +8,12 @@
 <!--
 [![DOI](https://zenodo.org/badge/DOI/[DOINUMBER]/zenodo.8189402.svg)](https://doi.org/[DOINUMBER]/zenodo.8189402) -->
 
-(If you read this in NPM's repository MathJax formulas won't render well. Use this [GitHub link instead](https://github.com/santi-mir/fit-tnt)).
+> [!NOTE]
+> If you read this in NPM's repository MathJax formulas won't render well. Use this [GitHub link instead](https://github.com/santi-mir/fit-tnt)).
 
-If you have a linear system of equations: $X \mathbf{\beta} = \mathbf{y}$, this software finds the optimal coefficients $\mathbf{\beta}$ through a variation of ordinary least squares. It supports multiple right-hand-sides.
+Given a linear system of equations: $X \mathbf{\beta} = \mathbf{y}$, this software finds the optimal coefficients $\mathbf{\beta}$ through a variation of ordinary least squares. It supports multiple right-hand-sides.
 
-The method is based off the [TNT](https://ieeexplore.ieee.org/abstract/document/8425520) paper by J. M. Myre et al.
-
-<details>
-<summary>Recommendations</summary>
-
-- Speed. Best when these apply:
-
-  - $\large\frac{\mathrm{rows}}{\mathrm{cols}} \geq 1$.
-  - Data columns $\geq 10$. But it's worth trying in any case.
-
-- Accuracy: it's frequently as accurate as QR or PseudoInverse but it will have larger error (normally still acceptable) with tricky matrices.
-
-[For speed, see comparison here](#comparison-tnt-vs-pseudo-inverse).
-
-_For calculations with non-zero intercept_, remember to push a $1$ to each row. The coefficient will be the last item in **XBest**.
-
-A more thorough webpage to compare speed/accuracy will hopefully be included soon.
-
-</details>
+The method follows the [TNT](https://ieeexplore.ieee.org/abstract/document/8425520) paper by J. M. Myre et al.
 
 ## Install and Use
 
@@ -58,7 +41,7 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
 
 ## Documentation
 
-- [Docs here](https://newresu.github.io/fit-tnt/modules.html)
+- [Docs here](https://santi-mir.github.io/fit-tnt/modules.html)
 
 ## Comparison: TNT vs Pseudo-Inverse
 
@@ -70,6 +53,25 @@ A related method is [Ridge Regression](https://en.wikipedia.org/wiki/Ridge_regre
   | ------------- | ------------------- | ------------------- |
   | TNT           | 0.09470919929999999 | 0.04945702797110891 |
   | PseudoInverse | 0.49272041820000007 | 0.04945702797110894 |
+
+
+<details>
+<summary>Observations</summary>
+
+- Speed. Best when these apply:
+
+  - $\large\frac{\mathrm{rows}}{\mathrm{cols}} \geq 1$.
+  - Data columns $\geq 10$. But it's worth trying in any case.
+
+- Accuracy: it's frequently as accurate as QR or PseudoInverse but it will have larger error (normally still acceptable) with tricky matrices.
+
+[For speed, see comparison here](#comparison-tnt-vs-pseudo-inverse).
+
+_For calculations with non-zero intercept_, remember to push a $1$ to each row. The coefficient will be the last item in **XBest**.
+
+A more thorough webpage to compare speed/accuracy will hopefully be included soon.
+
+</details>
 
 ## Misc.
 
@@ -148,9 +150,9 @@ Algorithm Description
 
 [npm-image]: https://img.shields.io/npm/v/fit-tnt.svg
 [npm-url]: https://www.npmjs.com/package/fit-tnt
-[ci-image]: https://github.com/newresu/fit-tnt/actions/workflows/nodejs.yml/badge.svg
-[ci-url]: https://github.com/newresu/fit-tnt/actions/workflows/nodejs.yml
-[codecov-image]: https://img.shields.io/codecov/c/github/newresu/fit-tnt.svg
-[codecov-url]: https://codecov.io/gh/newresu/fit-tnt
+[ci-image]: https://github.com/santi-mir/fit-tnt/actions/workflows/nodejs.yml/badge.svg
+[ci-url]: https://github.com/santi-mir/fit-tnt/actions/workflows/nodejs.yml
+[codecov-image]: https://img.shields.io/codecov/c/github/santi-mir/fit-tnt.svg
+[codecov-url]: https://codecov.io/gh/santi-mir/fit-tnt
 [download-image]: https://img.shields.io/npm/dm/fit-tnt.svg
 [download-url]: https://www.npmjs.com/package/fit-tnt
